@@ -375,7 +375,7 @@
             <div v-if="isResting" class="card-box glass border-primary p-4 text-center mb-4 bg-primary-soft">
                 <h4 class="text-primary fw-bold mb-2">REST TIME</h4>
                 <div class="display-1 fw-bold text-white mb-2">{{ restTimeLeft }}</div>
-                <p class="text-muted mb-3">Next: Set {{ currentSet }}</p>
+                <p class="text-muted mb-3">Next: {{ currentExercise ? currentExercise.name : '' }} (Set {{ currentSet }})</p>
                 <button @click="stopRest" class="btn btn-outline-primary btn-sm rounded-pill px-4">Skip
                     Rest</button>
             </div>
@@ -441,7 +441,7 @@
                                 RESTING...
                             </button>
                             <button
-                                v-else-if="!isNaN(parseInt(currentExercise.setsOrDuration)) && currentSet < parseInt(currentExercise.setsOrDuration)"
+                                v-else-if="isSetBased && currentSet <= parseInt(currentExercise.setsOrDuration)"
                                 @click="completeSet" class="btn btn-primary-neon w-100 py-3 rounded-3">
                                 COMPLETE SET {{ currentSet }} <i class="fa-solid fa-check ms-1"></i>
                             </button>
@@ -607,6 +607,13 @@
                     return (pointer.value && pointer.value.dayText === 'พัก') ? 'Rest Day' : 'Start Workout';
                 });
 
+                const isSetBased = computed(() => {
+                    if (!currentExercise.value) return false;
+                    const val = currentExercise.value.setsOrDuration;
+                    // ถือว่าเป็นแบบนับเซ็ตก็ต่อเมื่อเป็นตัวเลขล้วนๆ (เช่น "3", "4") ไม่ใช่ "30 นาที"
+                    return /^\d+$/.test(String(val).trim());
+                });
+
                 // --- Methods ---
                 // TODO: นำ Web App URL ที่ได้จาก Google Apps Script มาใส่ที่นี่
                 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxildinc8Ye2uU5cA0ep1ncZG7GEa0ZWDMECbZLmYIOh7ULzJX2lrQarwOFaM3wXVYO/exec';
@@ -734,6 +741,7 @@
                     if (activeStepIndex.value < todayWorkout.value.length - 1) {
                         activeStepIndex.value++;
                         currentSet.value = 1;
+                        startRest(60); // พัก 60 วิก่อนเริ่มท่าใหม่
                     } else {
                         finishWorkout();
                     }
@@ -902,7 +910,7 @@
                 return {
                     currentTab, isLoading, user, pointer, dashboardStats, history, todayWorkout,
                     isWorkoutActive, activeStepIndex, currentExercise, formattedTimer, startWorkoutText,
-                    logForm, planDay, selectedPlan,
+                    logForm, planDay, selectedPlan, isSetBased,
                     changeTab, startWorkoutWithConfirm, handleWorkoutTabClick, nextExercise, prevExercise, quitWorkout, submitLog,
                     completeSet, stopRest,
                     currentSet, isResting, restTimeLeft
