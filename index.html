@@ -1,11 +1,917 @@
 <!DOCTYPE html>
+<html lang="en">
 
-<html>
-   <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-      <base target="_top">
-   </head>
-   <body>
-      <iframe style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;" src="https://script.google.com/macros/s/AKfycbxildinc8Ye2uU5cA0ep1ncZG7GEa0ZWDMECbZLmYIOh7ULzJX2lrQarwOFaM3wXVYO/exec"></iframe>
-   </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Workout Phase System</title>
+
+    <!-- CDN Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <!-- Mobile APP / PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WPS Workout">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/dumbbell.png">
+
+    <style>
+        :root {
+            --font-main: 'Outfit', sans-serif;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #00eaff;
+            --secondary: #ff0099;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --nav-height: 75px;
+            --border-radius: 18px;
+            color-scheme: dark;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: #ffffff !important;
+            margin: 0;
+            padding: 0;
+            padding-bottom: calc(var(--nav-height) + 40px);
+            background: linear-gradient(135deg, #0f172a 0%, #1c2533 100%);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+
+        p,
+        span,
+        label,
+        td,
+        th,
+        small {
+            color: #e2e8f0 !important;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .text-secondary {
+            color: var(--secondary) !important;
+        }
+
+        .text-white {
+            color: #ffffff !important;
+        }
+
+        .bg-primary-soft {
+            background: rgba(0, 234, 255, 0.15) !important;
+        }
+
+        .bg-secondary-soft {
+            background: rgba(255, 0, 153, 0.15) !important;
+        }
+
+        .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(8px);
+            /* Re-enabling gently for better contrast, with fallback */
+        }
+
+        .btn-primary-neon {
+            background: var(--primary);
+            color: #000000;
+            font-weight: 800;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .text-secondary {
+            color: var(--secondary) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .app-header {
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-box {
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background: #0f172a;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .table {
+            color: #ffffff !important;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--primary) !important;
+        }
+
+        .table tbody td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #ffffff !important;
+        }
+
+        .form-control-glass {
+            background: rgba(15, 23, 42, 0.9) !important;
+            border: 1px solid #475569 !important;
+            color: white !important;
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .form-control-glass:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.2);
+        }
+
+        .object-fit-cover {
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- STATIC LOADER -->
+    <div id="static-loader"
+        class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark"
+        style="z-index: 9999;">
+        <div class="text-center text-white">
+            <div class="spinner-border text-primary" role="status"></div>
+            <div class="mt-3 fs-5 fw-bold text-white">Workout Phase System <span class="badge bg-primary"
+                    style="font-size: 10px;">v6.0</span></div>
+            <div id="loader-status" class="mt-2 text-white small">Loading Core...</div>
+            <div id="loader-error" class="mt-4 text-danger d-none px-3">
+                <p>Unable to connect to Google Script.</p>
+                <button onclick="location.reload()" class="btn btn-outline-danger btn-sm">Retry</button>
+            </div>
+            <div id="loader-manual" class="mt-4 d-none">
+                <button onclick="document.getElementById('static-loader').style.display='none'"
+                    class="btn btn-outline-primary btn-sm">Enter App Manually</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" v-cloak>
+
+        <!-- VUE LOADING OVERLAY -->
+        <div v-if="isLoading"
+            class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark"
+            style="z-index: 9990; opacity: 0.8;">
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted fw-bold">Processing...</p>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="app-header" v-if="!isWorkoutActive">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-dumbbell text-primary fs-4"></i>
+                <div>
+                    <div class="fw-bold fs-5 text-white">WPS <span class="text-primary">v6.0</span></div>
+                </div>
+            </div>
+
+            <div v-if="user" class="text-end">
+                <small class="text-muted d-block text-xs" style="font-size:0.75rem">USER</small>
+                <div class="fw-bold text-white">{{ user['ชื่อ'] || 'Guest' }}</div>
+            </div>
+        </header>
+
+        <!-- === DASHBOARD === -->
+        <div v-if="currentTab === 'dashboard'" class="container pt-3 pb-5">
+
+            <!-- Info Badge -->
+            <div v-if="pointer" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge bg-secondary text-white rounded-pill px-3">
+                    Phase {{ pointer.phase }}
+                </span>
+                <span class="text-muted small">Week {{ pointer.week }} • {{ pointer.dayText }}</span>
+            </div>
+
+            <!-- Main Action Card -->
+            <div class="card-box glass position-relative">
+                <h5 class="text-muted mb-2 text-uppercase small ls-1">Today's Workout</h5>
+                <h2 class="mb-3 fw-bold display-6 text-white" v-if="pointer">{{ pointer.dayText }}</h2>
+
+                <div v-if="pointer && pointer.dayText" class="mb-4">
+                    <span v-if="pointer.dayText === 'พัก'" class="text-success"><i class="fa-solid fa-mug-hot"></i> Rest
+                        Day</span>
+                    <span v-else class="text-info"><i class="fa-solid fa-fire"></i> Training Day</span>
+                </div>
+
+                <button @click="startWorkoutWithConfirm($event)" class="btn btn-primary-neon w-100 py-3 rounded-3"
+                    :disabled="pointer && pointer.dayText==='พัก'">
+                    <i class="fa-solid fa-play me-2"></i> {{ startWorkoutText }}
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row g-3" v-if="dashboardStats && dashboardStats.summary">
+                <div class="col-6">
+                    <div class="card-box glass p-3 text-center h-100">
+                        <i class="fa-solid fa-fire text-secondary fs-3 mb-2"></i>
+                        <h3 class="mb-0 fw-bold">{{ dashboardStats.summary.avgCalories }}</h3>
+                        <small class="text-muted">Avg Cal</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card-box glass p-3 text-center h-100">
+                        <i class="fa-solid fa-clock text-primary fs-3 mb-2"></i>
+                        <h3 class="mb-0 fw-bold">{{ dashboardStats.summary.avgDuration }}</h3>
+                        <small class="text-muted">Avg Min</small>
+                    </div>
+                </div>
+                <!-- Workout Plan Preview (v5.2) -->
+                <div class="mt-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-white mb-0 fw-bold">Workout Plan</h5>
+                        <div class="btn-group btn-group-sm rounded-pill overflow-hidden"
+                            style="background: rgba(255,255,255,0.05); padding: 2px;">
+                            <button class="btn border-0 py-1 px-3 rounded-pill transition-all"
+                                :class="planDay === 0 ? 'btn-primary text-dark shadow-sm' : 'text-muted'"
+                                @click="planDay = 0" style="font-size: 0.75rem;">Today</button>
+                            <button class="btn border-0 py-1 px-3 rounded-pill transition-all"
+                                :class="planDay === 1 ? 'btn-primary text-dark shadow-sm' : 'text-muted'"
+                                @click="planDay = 1" style="font-size: 0.75rem;">Tomorrow</button>
+                        </div>
+                    </div>
+
+                    <div class="card-box glass p-0 overflow-hidden border-0">
+                        <div v-if="selectedPlan && selectedPlan.items && selectedPlan.items.length > 0">
+                            <div v-for="(item, idx) in selectedPlan.items" :key="idx"
+                                class="p-3 d-flex justify-content-between align-items-center border-bottom border-white-5">
+                                <div class="flex-grow-1">
+                                    <div class="text-white fw-bold" style="font-size: 0.95rem;">{{ item.name }}</div>
+                                    <div class="text-muted small d-flex gap-2 align-items-center mt-1">
+                                        <span class="badge bg-white-10 text-white-50 fw-normal">Set: {{
+                                            item.setsOrDuration }}</span>
+                                        <span v-if="item.repsOrHR" class="text-primary-light">{{ item.repsOrHR }}</span>
+                                    </div>
+                                </div>
+                                <div class="text-white-50 x-small"><i class="fa-solid fa-chevron-right"></i></div>
+                            </div>
+                        </div>
+                        <div v-else class="p-5 text-center">
+                            <div class="mb-3 opacity-20"><i class="fa-solid fa-mug-hot display-4 text-white"></i></div>
+                            <div class="text-white fw-bold mb-1">Rest Day</div>
+                            <div class="text-muted small">Enjoy your recovery!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === WORKOUT VIEW === -->
+        <div v-if="currentTab === 'workout'" class="container pt-3 pb-5 d-flex flex-column min-vh-100">
+
+            <!-- Top Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <button @click="quitWorkout"
+                    class="btn btn-sm btn-secondary-neon rounded-pill d-flex align-items-center justify-content-center px-3 gap-2"
+                    style="height:40px">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span class="small fw-bold">Quit</span>
+                </button>
+                <div class="text-center">
+                    <div class="fw-bold fs-1 font-monospace text-primary"
+                        style="text-shadow: 0 0 10px rgba(0,234,255,0.3)">{{ formattedTimer }}</div>
+                </div>
+                <div class="text-end" style="min-width:60px">
+                    <span class="badge bg-dark border border-primary text-primary rounded-pill px-2 py-1">
+                        {{ activeStepIndex + 1 }}/{{ todayWorkout.length }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Rest Overlay -->
+            <div v-if="isResting" class="card-box glass border-primary p-4 text-center mb-4 bg-primary-soft">
+                <h4 class="text-primary fw-bold mb-2">REST TIME</h4>
+                <div class="display-1 fw-bold text-white mb-2">{{ restTimeLeft }}</div>
+                <p class="text-muted mb-3">Next: Set {{ currentSet }}</p>
+                <button @click="stopRest" class="btn btn-outline-primary btn-sm rounded-pill px-4">Skip
+                    Rest</button>
+            </div>
+
+            <!-- Exercise Display & Controls -->
+            <template v-if="currentExercise">
+                <div class="flex-grow-1">
+                    <div class="card-box glass h-100 d-flex flex-column">
+
+                        <!-- Media -->
+                        <div class="ratio ratio-16x9 rounded-3 overflow-hidden bg-black mb-3 border border-secondary"
+                            style="min-height: 200px;">
+                            <iframe v-if="currentExercise.video" :src="currentExercise.video" allowfullscreen
+                                class="w-100 h-100 border-0"></iframe>
+                            <img v-else-if="currentExercise.image" :src="currentExercise.image"
+                                class="w-100 h-100 object-fit-cover">
+                            <div v-else class="w-100 h-100 d-flex justify-content-center align-items-center text-muted">
+                                <i class="fa-solid fa-dumbbell fs-1 opacity-25"></i>
+                            </div>
+                        </div>
+
+                        <h3 class="fw-bold mb-2 text-white">{{ currentExercise.name }}</h3>
+
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-primary text-dark px-3 py-2 fs-6">{{
+                                currentExercise.setsOrDuration
+                                }}</span>
+                            <span class="badge bg-secondary text-white px-3 py-2 fs-6">{{ currentExercise.repsOrHR
+                                }}</span>
+                            <div class="ms-auto fw-bold text-primary"
+                                v-if="!isNaN(parseInt(currentExercise.setsOrDuration))">
+                                SET {{ currentSet }} / {{ parseInt(currentExercise.setsOrDuration) }}
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-dark rounded flex-grow-1 border border-secondary border-opacity-25">
+                            <small class="text-muted text-uppercase fw-bold">How to play</small>
+                            <p class="mb-0 mt-1">{{ currentExercise.howto || 'No description available.' }}</p>
+                        </div>
+
+                        <div v-if="currentExercise.note" class="alert alert-warning mt-3 mb-0 p-2 text-sm">
+                            <i class="fa-solid fa-circle-info me-1"></i> {{ currentExercise.note }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spacing for fixed bottom -->
+                <div style="height: 100px;"></div>
+
+                <!-- Controls -->
+                <div class="fixed-bottom p-3 glass border-top-0" style="background: #0f172a;">
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <button @click="prevExercise" class="btn btn-secondary-neon w-100 py-3 rounded-3"
+                                :disabled="activeStepIndex === 0">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                        </div>
+                        <div class="col-8">
+                            <!-- Complex Button: Rest -> Next Set -> Next Exercise -->
+                            <button v-if="isResting" @click="stopRest"
+                                class="btn btn-warning w-100 py-3 rounded-3 fw-bold">
+                                RESTING...
+                            </button>
+                            <button
+                                v-else-if="!isNaN(parseInt(currentExercise.setsOrDuration)) && currentSet < parseInt(currentExercise.setsOrDuration)"
+                                @click="completeSet" class="btn btn-primary-neon w-100 py-3 rounded-3">
+                                COMPLETE SET {{ currentSet }} <i class="fa-solid fa-check ms-1"></i>
+                            </button>
+                            <button v-else @click="nextExercise" class="btn btn-primary-neon w-100 py-3 rounded-3">
+                                {{ activeStepIndex >= todayWorkout.length - 1 ? 'Finish Workout' :
+                                'Next Exercise' }} <i class="fa-solid fa-chevron-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center border-top border-white-5 pt-2">
+                        <a href="#" @click.prevent="quitWorkout"
+                            class="text-muted small text-decoration-none opacity-50">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Quit Workout
+                        </a>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Fallback if exercise data missing -->
+            <div v-else
+                class="flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center p-5">
+                <i class="fa-solid fa-triangle-exclamation text-warning display-4 mb-3"></i>
+                <h5 class="text-white">Exercise Data Missing</h5>
+                <p class="text-muted small">Something went wrong while loading this step.</p>
+                <button @click="quitWorkout" class="btn btn-sm btn-outline-secondary rounded-pill mt-3">Back to
+                    Home</button>
+            </div>
+        </div>
+
+        <!-- === SAVE LOG === -->
+        <div v-if="currentTab === 'save_log'" class="container pt-5 pb-5">
+            <div class="card-box glass p-4 text-center">
+                <h2 class="fw-bold text-success mb-2">Completed!</h2>
+                <div class="display-3 fw-bold text-white mb-4">{{ logForm.duration }}<small
+                        class="fs-6 text-muted">min</small></div>
+
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="text-muted small">Avg HR</label>
+                        <input type="number" v-model="logForm.avgHR" class="form-control form-control-glass">
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Calories (kcal)</label>
+                        <input type="number" v-model="logForm.calories" class="form-control form-control-glass">
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Notes</label>
+                        <textarea v-model="logForm.notes" class="form-control form-control-glass" rows="2"></textarea>
+                    </div>
+
+                    <button @click="submitLog" class="btn btn-success w-100 py-3 rounded-3 fw-bold">Save
+                        Log</button>
+                    <button @click="currentTab='dashboard'"
+                        class="btn btn-link text-muted w-100 mt-2 text-decoration-none">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === HISTORY === -->
+        <div v-if="currentTab === 'history'" class="container pt-3 pb-5">
+            <h4 class="mb-3 fw-bold">History Record</h4>
+
+            <div v-if="history.length > 0">
+                <div v-for="(row, idx) in history" :key="idx" class="card-box glass p-3 mb-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-primary fw-bold">{{ row[0] }}</span>
+                        <span class="badge bg-secondary">Phase {{ row[1] }}</span>
+                    </div>
+                    <div class="text-sm text-muted">
+                        Time: {{ row[5] }}m | Cal: {{ row[8] }} | HR: {{ row[6] }}
+                    </div>
+                </div>
+            </div>
+            <div v-else class="text-center py-5 text-muted">
+                <i class="fa-solid fa-inbox display-1 mb-3 opacity-25"></i>
+                <p>No History Found</p>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav" v-if="!isWorkoutActive && currentTab !== 'save_log' && !isLoading">
+            <button class="nav-item" :class="{ active: currentTab === 'dashboard' }"
+                @click="changeTab('dashboard', $event)">
+                <i class="fa-solid fa-house"></i> <span>Home</span>
+            </button>
+            <button class="nav-item" :class="{ active: currentTab === 'workout' }"
+                @click="handleWorkoutTabClick($event)">
+                <i class="fa-solid fa-dumbbell"></i> <span>Workout</span>
+            </button>
+            <button class="nav-item" :class="{ active: currentTab === 'history' }"
+                @click="changeTab('history', $event)">
+                <i class="fa-solid fa-clock-rotate-left"></i> <span>Log</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        // Global Error Handler
+        // Global UI Helper for Loader
+        function updateStatus(msg, isError = false) {
+            const statusEl = document.getElementById('loader-status');
+            const errorEl = document.getElementById('loader-error');
+            if (statusEl) statusEl.innerText = msg;
+            if (isError && errorEl) errorEl.classList.remove('d-none');
+        }
+
+        window.onerror = function (msg, url, line) {
+            updateStatus("App Error: " + msg + " (" + line + ")", true);
+            alert("Fatal Error: " + msg);
+            document.getElementById('static-loader').style.display = 'none';
+        };
+
+        const { createApp, ref, computed, onMounted, reactive } = Vue;
+
+        const app = createApp({
+            setup() {
+                // --- State ---
+                const currentTab = ref('dashboard');
+                const isLoading = ref(true);
+                const user = ref(null);
+                const pointer = ref(null);
+                const todayWorkout = ref([]);
+                const history = ref([]);
+                const dashboardStats = ref(null);
+
+                // Workout Mode
+                const isWorkoutActive = ref(false);
+                const activeStepIndex = ref(0);
+                const workoutTimer = ref(0);
+                const workoutTimerInterval = ref(null);
+                const currentSet = ref(1);
+                const isResting = ref(false);
+                const restTimeLeft = ref(0);
+                const restInterval = ref(null);
+                const isLaunchLocked = ref(true); // Prevent auto-start for 1.5s after load
+                const wakeLock = ref(null); // Screen Wake Lock Sentinel
+                const planDay = ref(0); // 0=Today, 1=Tomorrow
+                const todayPlan = ref(null);
+                const tomorrowPlan = ref(null);
+
+                const logForm = reactive({
+                    duration: 0, avgHR: '', maxHR: '', calories: '', rpe: '', notes: ''
+                });
+
+                // --- Computed ---
+                const currentExercise = computed(() => {
+                    if (!isWorkoutActive.value || !todayWorkout.value.length) return null;
+                    return todayWorkout.value[activeStepIndex.value];
+                });
+
+                const selectedPlan = computed(() => {
+                    return planDay.value === 0 ? todayPlan.value : tomorrowPlan.value;
+                });
+
+                const formattedTimer = computed(() => {
+                    const m = Math.floor(workoutTimer.value / 60).toString().padStart(2, '0');
+                    const s = (workoutTimer.value % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                });
+
+                const startWorkoutText = computed(() => {
+                    return (pointer.value && pointer.value.dayText === 'พัก') ? 'Rest Day' : 'Start Workout';
+                });
+
+                // --- Methods ---
+                // TODO: นำ Web App URL ที่ได้จาก Google Apps Script มาใส่ที่นี่
+                const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxildinc8Ye2uU5cA0ep1ncZG7GEa0ZWDMECbZLmYIOh7ULzJX2lrQarwOFaM3wXVYO/exec';
+
+                async function runGas(funcName, ...args) {
+                    console.log(`[API CALL] ${funcName}`, args);
+                    if (GAS_WEB_APP_URL === 'YOUR_WEB_APP_URL_HERE') {
+                        throw new Error("Please set GAS_WEB_APP_URL in index.html");
+                    }
+                    try {
+                        // Using text/plain to avoid CORS preflight OPTIONS request
+                        const response = await fetch(GAS_WEB_APP_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'text/plain;charset=utf-8',
+                            },
+                            body: JSON.stringify({ funcName, args })
+                        });
+                        const data = await response.json();
+                        if (data.error) throw new Error(data.error);
+                        console.log(`[API SUCCESS] ${funcName}`, data.result);
+                        return data.result;
+                    } catch (err) {
+                        console.error(`[API FAILURE] ${funcName}`, err);
+                        throw err;
+                    }
+                }
+
+                const statusMessage = ref('Ready');
+
+                const loadInitialData = async () => {
+                    isLoading.value = true;
+                    try {
+                        updateStatus("Checking Connection...");
+                        await runGas('pingTest');
+
+                        updateStatus("Loading User Profile...");
+                        user.value = await runGas('getUserSetting');
+
+                        updateStatus("Fetching Dashboard Stats...");
+                        dashboardStats.value = await runGas('getDashboardData');
+
+                        updateStatus("Syncing Workout Plan...");
+                        // Load plans one by one to avoid parallel hang in some GAS environments
+                        const p0 = await runGas('getWorkoutByOffset', 0);
+                        const p1 = await runGas('getWorkoutByOffset', 1);
+
+                        todayPlan.value = p0;
+                        tomorrowPlan.value = p1;
+                        pointer.value = p0 ? p0.pointer : null;
+
+                        updateStatus("Ready!");
+                    } catch (e) {
+                        console.error("Load Error:", e);
+                        updateStatus("Load Failed: " + e, true);
+                        // Still try to hide loader after 5s if it hangs on a non-fatal error
+                        setTimeout(() => {
+                            const sl = document.getElementById('static-loader');
+                            if (sl) sl.style.setProperty('display', 'none', 'important');
+                        }, 5000);
+                    } finally {
+                        isLoading.value = false;
+                        // Hide static loader
+                        setTimeout(() => {
+                            const sl = document.getElementById('static-loader');
+                            if (sl) sl.style.setProperty('display', 'none', 'important');
+                        }, 500);
+                    }
+                };
+
+                const startWorkoutWithConfirm = async (event) => {
+                    console.log("startWorkoutWithConfirm triggered.");
+
+                    if (isLaunchLocked.value) return;
+                    if (event && event.isTrusted === false) return;
+
+                    if (!confirm("Start your workout now?")) return;
+
+                    // Request Wake Lock
+                    requestWakeLock();
+
+                    try {
+                        isLoading.value = true;
+
+                        // Optimization v5.7: Use cached todayPlan if available
+                        let items = (todayPlan.value && todayPlan.value.items) ? todayPlan.value.items : null;
+
+                        // Fallback to network if cache missing
+                        if (!items || items.length === 0) {
+                            const res = await runGas('getTodayWorkout');
+                            items = (res && res.items) ? res.items : [];
+                        }
+
+                        if (items && items.length > 0) {
+                            todayWorkout.value = [...items]; // Clone array for safety
+                            activeStepIndex.value = 0;
+                            currentSet.value = 1;
+                            isResting.value = false;
+                            isWorkoutActive.value = true;
+                            currentTab.value = 'workout';
+                            startTimer();
+                            console.log("Workout Started Successfully with", items.length, "items.");
+                        } else {
+                            alert('No workout program found for today (or Rest Day)!');
+                        }
+                    } catch (e) {
+                        console.error("Start Workout Error:", e);
+                        alert("Cannot start workout: " + e);
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const quitWorkout = () => {
+                    if (confirm("Exit workout? Progress will be lost.")) {
+                        stopTimer();
+                        releaseWakeLock();
+                        isWorkoutActive.value = false;
+                        currentTab.value = 'dashboard';
+                    }
+                };
+
+                const nextExercise = () => {
+                    stopRest();
+                    if (activeStepIndex.value < todayWorkout.value.length - 1) {
+                        activeStepIndex.value++;
+                        currentSet.value = 1;
+                    } else {
+                        finishWorkout();
+                    }
+                };
+
+                const prevExercise = () => {
+                    stopRest();
+                    if (activeStepIndex.value > 0) {
+                        activeStepIndex.value--;
+                        currentSet.value = 1;
+                    }
+                };
+
+                const completeSet = () => {
+                    const totalSets = parseInt(currentExercise.value.setsOrDuration);
+                    if (isNaN(totalSets)) {
+                        nextExercise();
+                        return;
+                    }
+
+                    if (currentSet.value < totalSets) {
+                        currentSet.value++;
+                        startRest(60); // Rest between sets
+                    } else {
+                        // Last set of current exercise
+                        if (activeStepIndex.value < todayWorkout.value.length - 1) {
+                            // Move to next exercise and rest
+                            activeStepIndex.value++;
+                            currentSet.value = 1;
+                            startRest(60); // Rest between exercises
+                        } else {
+                            finishWorkout();
+                        }
+                    }
+                };
+
+                const startRest = (seconds) => {
+                    isResting.value = true;
+                    restTimeLeft.value = seconds;
+                    if (restInterval.value) clearInterval(restInterval.value);
+                    restInterval.value = setInterval(() => {
+                        restTimeLeft.value--;
+                        if (restTimeLeft.value <= 0) stopRest();
+                    }, 1000);
+                };
+
+                const stopRest = () => {
+                    isResting.value = false;
+                    if (restInterval.value) clearInterval(restInterval.value);
+                    restInterval.value = null;
+                };
+
+                // --- Screen Wake Lock Logic ---
+                const requestWakeLock = async () => {
+                    if ('wakeLock' in navigator) {
+                        try {
+                            wakeLock.value = await navigator.wakeLock.request('screen');
+                            console.log("Screen Wake Lock Active.");
+                            wakeLock.value.addEventListener('release', () => {
+                                console.log("Screen Wake Lock Released.");
+                            });
+                        } catch (err) {
+                            console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+                        }
+                    }
+                };
+
+                const releaseWakeLock = () => {
+                    if (wakeLock.value) {
+                        wakeLock.value.release();
+                        wakeLock.value = null;
+                    }
+                };
+
+                const finishWorkout = () => {
+                    stopTimer();
+                    releaseWakeLock();
+                    logForm.duration = Math.ceil(workoutTimer.value / 60);
+                    currentTab.value = 'save_log';
+                };
+
+                const startTimer = () => {
+                    stopTimer();
+                    workoutTimer.value = 0;
+                    workoutTimerInterval.value = setInterval(() => { workoutTimer.value++; }, 1000);
+                };
+
+                const stopTimer = () => {
+                    if (workoutTimerInterval.value) clearInterval(workoutTimerInterval.value);
+                };
+
+                const submitLog = async () => {
+                    isLoading.value = true;
+                    try {
+                        await runGas('saveDailyLog', JSON.parse(JSON.stringify(logForm)));
+                        alert("Saved Successfully!");
+                        isWorkoutActive.value = false;
+                        currentTab.value = 'dashboard';
+                        loadInitialData();
+                    } catch (e) {
+                        alert("Save Error: " + e);
+                    } finally {
+                        isLoading.value = false;
+                        releaseWakeLock();
+                    }
+                };
+
+                const changeTab = (tab, event) => {
+                    // Safety Guard
+                    if (isLaunchLocked.value) return;
+                    if (event && event.isTrusted === false) return;
+
+                    // Navigation Guard: Don't allow manual switch to 'workout' tab if no workout is active
+                    if (tab === 'workout' && !isWorkoutActive.value) {
+                        currentTab.value = 'dashboard';
+                        return;
+                    }
+
+                    currentTab.value = tab;
+                    if (tab === 'history') {
+                        isLoading.value = true;
+                        runGas('getHistory', 20)
+                            .then(res => {
+                                history.value = (res && res.rows) ? res.rows : [];
+                            })
+                            .catch(e => {
+                                console.error("History Load Error:", e);
+                                history.value = [];
+                            })
+                            .finally(() => { isLoading.value = false; });
+                    }
+                };
+
+                const handleWorkoutTabClick = (event) => {
+                    // Safety Guard
+                    if (isLaunchLocked.value) return;
+                    if (event && event.isTrusted === false) return;
+
+                    if (isWorkoutActive.value) {
+                        changeTab('workout', event);
+                    } else {
+                        alert("Please start a workout from the Home screen first!");
+                        changeTab('dashboard', event);
+                    }
+                };
+
+                onMounted(() => {
+                    console.log("Vue App Mounted.");
+                    loadInitialData();
+
+                    // Re-acquire Wake Lock if app returns from background
+                    document.addEventListener('visibilitychange', async () => {
+                        if (isWorkoutActive.value && document.visibilityState === 'visible') {
+                            await requestWakeLock();
+                        }
+                    });
+                    // Show manual button after 1.5s as fail-safe
+                    setTimeout(() => {
+                        const mb = document.getElementById('loader-manual');
+                        if (mb) mb.classList.remove('d-none');
+                        isLaunchLocked.value = false; // Unlock starts after 1.5s
+                        console.log("Start Guard Unlocked.");
+                    }, 1500);
+                });
+
+                return {
+                    currentTab, isLoading, user, pointer, dashboardStats, history, todayWorkout,
+                    isWorkoutActive, activeStepIndex, currentExercise, formattedTimer, startWorkoutText,
+                    logForm, planDay, selectedPlan,
+                    changeTab, startWorkoutWithConfirm, handleWorkoutTabClick, nextExercise, prevExercise, quitWorkout, submitLog,
+                    completeSet, stopRest,
+                    currentSet, isResting, restTimeLeft
+                };
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+
 </html>
