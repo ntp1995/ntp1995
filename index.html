@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 
     <!-- Mobile APP / PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,15 +24,15 @@
 
     <style>
         :root {
-            --font-main: 'Outfit', sans-serif;
+            --font-main: 'Prompt', sans-serif;
             --bg-dark: #0f172a;
-            --bg-card: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.6);
             --primary: #00eaff;
             --secondary: #ff0099;
-            --text-main: #ffffff;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --nav-height: 75px;
-            --border-radius: 18px;
+            --nav-height: 80px;
+            --border-radius: 24px;
             color-scheme: dark;
         }
 
@@ -43,104 +44,81 @@
         body {
             font-family: var(--font-main);
             background-color: var(--bg-dark);
-            color: #ffffff !important;
+            color: var(--text-main) !important;
             margin: 0;
             padding: 0;
-            padding-bottom: calc(var(--nav-height) + 40px);
-            background: linear-gradient(135deg, #0f172a 0%, #1c2533 100%);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 20px);
+            background: radial-gradient(circle at 10% 20%, rgba(0, 234, 255, 0.1) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(255, 0, 153, 0.1) 0%, transparent 40%),
+                        #0f172a;
+            background-attachment: fixed;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            color: #ffffff !important;
-            font-weight: 700;
-        }
+        h1, h2, h3, h4, h5, h6 { font-weight: 700; color: #fff !important; }
+        p, span, small, label, td, th { color: var(--text-main) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+        .text-primary { color: var(--primary) !important; }
+        .text-secondary { color: var(--secondary) !important; }
+        .bg-primary-soft { background: rgba(0, 234, 255, 0.1) !important; }
+        .bg-secondary-soft { background: rgba(255, 0, 153, 0.1) !important; }
 
-        p,
-        span,
-        label,
-        td,
-        th,
-        small {
-            color: #e2e8f0 !important;
-        }
-
-        .text-primary {
-            color: var(--primary) !important;
-        }
-
-        .text-secondary {
-            color: var(--secondary) !important;
-        }
-
-        .text-white {
-            color: #ffffff !important;
-        }
-
-        .bg-primary-soft {
-            background: rgba(0, 234, 255, 0.15) !important;
-        }
-
-        .bg-secondary-soft {
-            background: rgba(255, 0, 153, 0.15) !important;
-        }
-
-        .text-muted {
-            color: #94a3b8 !important;
-        }
-
-        [v-cloak] {
-            display: none !important;
-        }
+        [v-cloak] { display: none !important; }
 
         .glass {
-            background: rgba(30, 41, 59, 0.8) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            background: var(--bg-card) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
             border-radius: var(--border-radius);
-            backdrop-filter: blur(8px);
-            /* Re-enabling gently for better contrast, with fallback */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .btn-primary-neon {
-            background: var(--primary);
-            color: #000000;
-            font-weight: 800;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            font-weight: 700;
             border: none;
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
-            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+            border-radius: 16px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary-neon:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 10px rgba(0, 198, 255, 0.3);
         }
 
-        .text-primary {
-            color: var(--primary) !important;
+        .btn-secondary-neon {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.2s ease;
         }
-
-        .text-secondary {
-            color: var(--secondary) !important;
-        }
-
-        .text-muted {
-            color: var(--text-muted) !important;
+        .btn-secondary-neon:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .app-header {
-            padding: 20px;
+            padding: 16px 20px;
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
 
         .card-box {
@@ -149,70 +127,111 @@
             margin-bottom: 20px;
         }
 
+        /* Floating Bottom Nav */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: var(--nav-height);
-            background: #0f172a;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-around;
-            align-items: center;
+            align-items: flex-start;
             z-index: 100;
+            padding-top: 12px;
             padding-bottom: env(safe-area-inset-bottom);
         }
 
         .nav-item {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 0.75rem;
             font-weight: 600;
             background: none;
             border: none;
-            padding: 10px;
+            padding: 8px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .nav-item.active {
             color: var(--primary);
         }
-
-        .nav-item i {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
+        .nav-item.active i {
+            transform: translateY(-4px) scale(1.15);
+            filter: drop-shadow(0 4px 8px rgba(0, 234, 255, 0.5));
         }
 
-        .table {
-            color: #ffffff !important;
+        /* Vue Transitions */
+        .fade-slide-enter-active, .fade-slide-leave-active {
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+        }
+        .fade-slide-enter-from { opacity: 0; transform: translateY(10px) scale(0.98); }
+        .fade-slide-leave-to { opacity: 0; transform: translateY(-10px) scale(0.98); }
+
+        /* Fullscreen Rest Overlay */
+        .rest-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        
+        .pulse-timer {
+            animation: pulse-ring 2s infinite;
+            border-radius: 50%;
+            padding: 40px;
+            margin: 20px 0;
+            background: radial-gradient(circle, rgba(0,234,255,0.2) 0%, transparent 70%);
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 234, 255, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 234, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 234, 255, 0); }
         }
 
-        .table thead th {
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            color: var(--primary) !important;
-        }
-
-        .table tbody td {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: #ffffff !important;
+        /* Edge-to-edge Video */
+        .video-container {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            border-radius: 0;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .form-control-glass {
-            background: rgba(15, 23, 42, 0.9) !important;
-            border: 1px solid #475569 !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: white !important;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 1rem;
         }
-
         .form-control-glass:focus {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.2);
+            box-shadow: 0 0 0 4px rgba(0, 234, 255, 0.15);
         }
 
-        .object-fit-cover {
-            object-fit: cover;
-        }
+        .object-fit-cover { object-fit: cover; }
     </style>
 </head>
 
@@ -265,8 +284,10 @@
             </div>
         </header>
 
-        <!-- === DASHBOARD === -->
-        <div v-if="currentTab === 'dashboard'" class="container pt-3 pb-5">
+        <!-- VIEWS WRAPPER -->
+        <transition name="fade-slide" mode="out-in">
+            <!-- === DASHBOARD === -->
+            <div v-if="currentTab === 'dashboard'" key="dashboard" class="container pt-3 pb-5">
 
             <!-- Info Badge -->
             <div v-if="pointer" class="d-flex justify-content-between align-items-center mb-3">
@@ -349,8 +370,8 @@
             </div>
         </div>
 
-        <!-- === WORKOUT VIEW === -->
-        <div v-if="currentTab === 'workout'" class="container pt-3 pb-5 d-flex flex-column min-vh-100">
+            <!-- === WORKOUT VIEW === -->
+            <div v-else-if="currentTab === 'workout'" key="workout" class="container pt-2 pb-5 d-flex flex-column min-vh-100">
 
             <!-- Top Bar -->
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -371,23 +392,29 @@
                 </div>
             </div>
 
-            <!-- Rest Overlay -->
-            <div v-if="isResting" class="card-box glass border-primary p-4 text-center mb-4 bg-primary-soft">
-                <h4 class="text-primary fw-bold mb-2">REST TIME</h4>
-                <div class="display-1 fw-bold text-white mb-2">{{ restTimeLeft }}</div>
-                <p class="text-muted mb-3">Next: {{ currentExercise ? currentExercise.name : '' }} (Set {{ currentSet }})</p>
-                <button @click="stopRest" class="btn btn-outline-primary btn-sm rounded-pill px-4">Skip
-                    Rest</button>
-            </div>
+            <!-- Fullscreen Rest Overlay -->
+            <transition name="fade-slide">
+                <div v-if="isResting" class="rest-overlay">
+                    <h2 class="text-primary fw-bold mb-3">REST TIME</h2>
+                    <div class="pulse-timer">
+                        <div class="display-1 fw-bold text-white m-0" style="font-variant-numeric: tabular-nums;">{{ restTimeLeft }}</div>
+                    </div>
+                    <h5 class="text-white mt-4 text-center">Next Exercise:</h5>
+                    <p class="text-primary fw-bold fs-3 text-center mb-1">{{ currentExercise ? currentExercise.name : '' }}</p>
+                    <p class="text-muted text-center mb-5 fs-5">Set {{ currentSet }}</p>
+                    <button @click="stopRest" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold" style="letter-spacing: 2px;">
+                        SKIP REST
+                    </button>
+                </div>
+            </transition>
 
             <!-- Exercise Display & Controls -->
             <template v-if="currentExercise">
                 <div class="flex-grow-1">
                     <div class="card-box glass h-100 d-flex flex-column">
 
-                        <!-- Media -->
-                        <div class="ratio ratio-16x9 rounded-3 overflow-hidden bg-black mb-3 border border-secondary"
-                            style="min-height: 200px;">
+                        <!-- Media Edge-to-Edge -->
+                        <div class="ratio ratio-16x9 bg-black mb-4 video-container">
                             <iframe v-if="currentExercise.video" :src="currentExercise.video" allowfullscreen
                                 class="w-100 h-100 border-0"></iframe>
                             <img v-else-if="currentExercise.image" :src="currentExercise.image"
@@ -472,7 +499,7 @@
         </div>
 
         <!-- === SAVE LOG === -->
-        <div v-if="currentTab === 'save_log'" class="container pt-5 pb-5">
+        <div v-else-if="currentTab === 'save_log'" key="save_log" class="container pt-5 pb-5">
             <div class="card-box glass p-4 text-center">
                 <h2 class="fw-bold text-success mb-2">Completed!</h2>
                 <div class="display-3 fw-bold text-white mb-4">{{ logForm.duration }}<small
@@ -501,7 +528,7 @@
         </div>
 
         <!-- === HISTORY === -->
-        <div v-if="currentTab === 'history'" class="container pt-3 pb-5">
+        <div v-else-if="currentTab === 'history'" key="history" class="container pt-3 pb-5">
             <h4 class="mb-3 fw-bold">History Record</h4>
 
             <div v-if="history.length > 0">
@@ -520,6 +547,8 @@
                 <p>No History Found</p>
             </div>
         </div>
+
+        </transition>
 
         <!-- BOTTOM NAV -->
         <nav class="bottom-nav" v-if="!isWorkoutActive && currentTab !== 'save_log' && !isLoading">
@@ -582,6 +611,7 @@
                 const planDay = ref(0); // 0=Today, 1=Tomorrow
                 const todayPlan = ref(null);
                 const tomorrowPlan = ref(null);
+                const noSleep = new NoSleep(); // NoSleep.js instance
 
                 const logForm = reactive({
                     duration: 0, avgHR: '', maxHR: '', calories: '', rpe: '', notes: ''
@@ -694,6 +724,7 @@
 
                     // Request Wake Lock
                     requestWakeLock();
+                    try { noSleep.enable(); console.log("NoSleep enabled."); } catch(e){}
 
                     try {
                         isLoading.value = true;
@@ -814,6 +845,7 @@
                         wakeLock.value.release();
                         wakeLock.value = null;
                     }
+                    try { noSleep.disable(); console.log("NoSleep disabled."); } catch(e){}
                 };
 
                 const finishWorkout = () => {
