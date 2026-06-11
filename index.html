@@ -21,6 +21,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/dumbbell.png">
+    <link rel="manifest" href="manifest.json">
 
     <style>
         :root {
@@ -809,13 +810,56 @@
                     }
                 };
 
+                // --- Audio Feedback ---
+                let audioCtx = null;
+                const playBeep = (type = 'short') => {
+                    try {
+                        if (!audioCtx) {
+                            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        }
+                        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+
+                        if (type === 'short') {
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                            oscillator.start(audioCtx.currentTime);
+                            oscillator.stop(audioCtx.currentTime + 0.1);
+                        } else if (type === 'long') {
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                            oscillator.start(audioCtx.currentTime);
+                            oscillator.stop(audioCtx.currentTime + 0.5);
+                        }
+                    } catch (e) {
+                        console.error("Audio beep failed:", e);
+                    }
+                };
+
                 const startRest = (seconds) => {
                     isResting.value = true;
                     restTimeLeft.value = seconds;
                     if (restInterval.value) clearInterval(restInterval.value);
                     restInterval.value = setInterval(() => {
                         restTimeLeft.value--;
-                        if (restTimeLeft.value <= 0) stopRest();
+                        
+                        if (restTimeLeft.value > 0 && restTimeLeft.value <= 6) {
+                            playBeep('short');
+                        }
+
+                        if (restTimeLeft.value <= 0) {
+                            playBeep('long');
+                            stopRest();
+                        }
                     }, 1000);
                 };
 
